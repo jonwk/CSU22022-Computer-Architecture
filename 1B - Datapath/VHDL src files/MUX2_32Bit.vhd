@@ -1,0 +1,20 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity MUX_2_32Bit is
+    Port(
+       In0 : IN  std_logic_vector(31 downto 0);
+       In1 : IN  std_logic_vector(31 downto 0);
+       s : in std_logic;
+       Z : out std_logic_vector(31 downto 0)
+    );
+end MUX_2_32Bit;
+
+architecture Behavioral of MUX_2_32Bit is
+begin
+    Z <= In0 after 5 ns when s='0' else
+    In1 after 5 ns when s='1' else
+    x"00000000" after 5 ns;
+end Behavioral;

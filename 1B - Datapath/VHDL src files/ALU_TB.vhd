@@ -1,0 +1,182 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity ALU_32Bit_TB is
+end ALU_32Bit_TB;
+
+architecture Behavioral of ALU_32Bit_TB is
+
+COMPONENT ALU_32Bit
+    PORT(
+         A : IN  std_logic_vector(31 downto 0);
+         B : IN  std_logic_vector(31 downto 0);
+         GSel : IN  std_logic_vector(3 downto 0);
+         C : OUT  std_logic;
+         V : OUT  std_logic;
+         G : OUT  std_logic_vector(31 downto 0)
+        );
+    END COMPONENT;
+    
+
+   --Inputs
+   signal A : std_logic_vector(31 downto 0) := (others => '0');
+   signal B : std_logic_vector(31 downto 0) := (others => '0');
+   signal GSel : std_logic_vector(3 downto 0) := (others => '0');
+
+    --Outputs
+   signal C : std_logic;
+   signal V : std_logic;
+   signal G : std_logic_vector(31 downto 0);
+ 
+BEGIN
+    -- Instantiate the Unit Under Test (UUT)
+   uut: ALU_32Bit PORT MAP (
+          A => A,
+          B => B,
+          GSel => GSel,
+          C => C,
+          V => V,
+          G => G
+        );
+
+   -- Stimulus process
+   stim_proc: process
+   begin
+------Arithmetic Ops-----------------------------------------   
+        -- G = A
+        A <= x"00000001";
+        B <= x"00000002";
+        
+        GSel(3) <= '0';
+        GSel(2) <= '0';
+        GSel(1) <= '0';
+        GSel(0) <= '0';
+        wait for 75ns;
+        
+        -- G = A + 1
+        A <= x"00000001";
+        B <= x"00000002";
+        
+        GSel(3) <= '0';
+        GSel(2) <= '0';
+        GSel(1) <= '0';
+        GSel(0) <= '1';
+        wait for 75ns;
+        
+        -- G = A + B
+        A <= x"00000001";
+        B <= x"00000002";
+        
+        GSel(3) <= '0';
+        GSel(2) <= '0';
+        GSel(1) <= '1';
+        GSel(0) <= '0';
+        wait for 75ns;
+        
+        -- G = A + B + 1
+        A <= x"00000001";
+        B <= x"00000002";
+        
+        GSel(3) <= '0';
+        GSel(2) <= '0';
+        GSel(1) <= '1';
+        GSel(0) <= '1';
+        wait for 75ns;
+        
+        -- G = A + notB
+        A <= x"00000001";
+        B <= x"00000002";
+        
+        GSel(3) <= '0';
+        GSel(2) <= '1';
+        GSel(1) <= '0';
+        GSel(0) <= '0';
+        wait for 75ns;
+        
+        -- G = A - B
+        A <= x"00000001";
+        B <= x"00000002";
+        
+        GSel(3) <= '0';
+        GSel(2) <= '1';
+        GSel(1) <= '0';
+        GSel(0) <= '1';
+        wait for 75ns;
+        
+        -- G = A - 1
+        A <= x"00000001";
+        B <= x"00000002";
+        
+        GSel(3) <= '0';
+        GSel(2) <= '1';
+        GSel(1) <= '1';
+        GSel(0) <= '0';
+        wait for 75ns;
+        
+        -- G = A
+        A <= x"00000001";
+        B <= x"00000002";
+        
+        GSel(3) <= '0';
+        GSel(2) <= '1';
+        GSel(1) <= '1';
+        GSel(0) <= '1';
+        wait for 75ns;
+
+        -- Logical Operations
+        -- G = A and B
+        A <= x"00000001";
+        B <= x"00000002";
+        
+        GSel(3) <= '1';
+        GSel(2) <= '0'; -- S1 does'nt matter for all logical ops
+        GSel(1) <= '0';
+        GSel(0) <= '0';
+        wait for 75ns;
+        
+        -- G = A or B
+        A <= x"00000001";
+        B <= x"00000002";
+        
+        GSel(3) <= '1';
+        GSel(2) <= '0';
+        GSel(1) <= '1';
+        GSel(0) <= '0';
+        wait for 75ns;
+        
+        -- G = A xor B
+        A <= x"00000001";
+        B <= x"00000002";
+        
+        GSel(3) <= '1';
+        GSel(2) <= '1';
+        GSel(1) <= '0';
+        GSel(0) <= '0';
+        wait for 75ns;
+        
+        -- G = notA
+        A <= x"00000001";
+        B <= x"00000002";
+        
+        GSel(3) <= '1';
+        GSel(2) <= '1';
+        GSel(1) <= '1';
+        GSel(0) <= '0';
+        wait for 75ns;
+        
+        -- Arithmetic Operation
+        -- G = A - B
+        A <= x"00000001";
+        B <= x"00000002";
+        
+        GSel(3) <= '1';
+        GSel(2) <= '1';
+        GSel(1) <= '1';
+        GSel(0) <= '1';
+        wait for 75ns;
+        
+   end process;
+
+END;

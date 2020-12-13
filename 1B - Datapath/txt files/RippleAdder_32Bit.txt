@@ -1,0 +1,295 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity Ripple_Adder is
+    Port(
+        A, B : in STD_LOGIC_VECTOR(31 downto 0);
+        Cin : in STD_LOGIC;
+        Cout, V_out : out STD_LOGIC;
+        G_out : out STD_LOGIC_VECTOR(31 downto 0)
+    );
+end Ripple_Adder;
+
+architecture Behavioral of Ripple_Adder is
+    Component Full_Adder
+        Port(
+            X, Y, Cin : in STD_LOGIC;
+            Cout, Sum : out STD_LOGIC
+            );
+    End Component;
+
+--signals - 32 carry bits and 1 output
+signal C0, C1, C2, C3, C4, C5, C6, C7, C8, C9,
+        C10, C11, C12, C13, C14, C15, C16, C17, C18, C19,
+        C20, C21, C22, C23, C24, C25, C26, C27, C28, C29,
+        C30, C31, C_out : STD_LOGIC;
+    
+begin
+    Full_Adder_00: Full_Adder PORT MAP(
+        X => A(0),
+        Y => B(0),
+        Cin => Cin,
+        Cout => C0,
+        Sum => G_out(0)
+        );
+        
+    Full_Adder_01: Full_Adder PORT MAP(
+        X => A(1),
+        Y => B(1),
+        Cin => C0,
+        Cout => C1,
+        Sum => G_out(1)
+        );
+        
+    Full_Adder_02: Full_Adder PORT MAP(
+        X => A(2),
+        Y => B(2),
+        Cin => C1,
+        Cout => C2,
+        Sum => G_out(2)
+        );
+        
+    Full_Adder_03: Full_Adder PORT MAP(
+        X => A(3),
+        Y => B(3),
+        Cin => C2,
+        Cout => C3,
+        Sum => G_out(3)
+        );
+        
+    Full_Adder_04: Full_Adder PORT MAP(
+        X => A(4),
+        Y => B(4),
+        Cin => C3,
+        Cout => C4,
+        Sum => G_out(4)
+        );
+        
+    Full_Adder_05: Full_Adder PORT MAP(
+        X => A(5),
+        Y => B(5),
+        Cin => C4,
+        Cout => C5,
+        Sum => G_out(5)
+        );
+        
+    Full_Adder_06: Full_Adder PORT MAP(
+        X => A(6),
+        Y => B(6),
+        Cin => C5,
+        Cout => C6,
+        Sum => G_out(6)
+        );
+        
+    Full_Adder_07: Full_Adder PORT MAP(
+        X => A(7),
+        Y => B(7),
+        Cin => C6,
+        Cout => C7,
+        Sum => G_out(7)
+        );
+        
+    Full_Adder_08: Full_Adder PORT MAP(
+        X => A(8),
+        Y => B(8),
+        Cin => C7,
+        Cout => C8,
+        Sum => G_out(8)
+        );
+        
+    Full_Adder_09: Full_Adder PORT MAP(
+        X => A(9),
+        Y => B(9),
+        Cin => C8,
+        Cout => C9,
+        Sum => G_out(9)
+        );
+        
+    Full_Adder_10: Full_Adder PORT MAP(
+        X => A(10),
+        Y => B(10),
+        Cin => C9,
+        Cout => C10,
+        Sum => G_out(10)
+        );
+        
+    Full_Adder_11: Full_Adder PORT MAP(
+        X => A(11),
+        Y => B(11),
+        Cin => C10,
+        Cout => C11,
+        Sum => G_out(11)
+        );
+        
+    Full_Adder_12: Full_Adder PORT MAP(
+        X => A(12),
+        Y => B(12),
+        Cin => C11,
+        Cout => C12,
+        Sum => G_out(12)
+        );
+        
+    Full_Adder_13: Full_Adder PORT MAP(
+        X => A(13),
+        Y => B(13),
+        Cin => C12,
+        Cout => C13,
+        Sum => G_out(13)
+        );
+        
+    Full_Adder_14: Full_Adder PORT MAP(
+        X => A(14),
+        Y => B(14),
+        Cin => C13,
+        Cout => C14,
+        Sum => G_out(14)
+        );
+        
+    Full_Adder_15: Full_Adder PORT MAP(
+        X => A(15),
+        Y => B(15),
+        Cin => C14,
+        Cout => C15,
+        Sum => G_out(15)
+        );
+        
+     Full_Adder_16: Full_Adder PORT MAP(
+        X => A(16),
+        Y => B(16),
+        Cin => C15,
+        Cout => C16,
+        Sum => G_out(16)
+        );
+        
+    Full_Adder_17: Full_Adder PORT MAP(
+        X => A(17),
+        Y => B(17),
+        Cin => C16,
+        Cout => C17,
+        Sum => G_out(17)
+        );
+        
+    Full_Adder_18: Full_Adder PORT MAP(
+        X => A(18),
+        Y => B(18),
+        Cin => C17,
+        Cout => C18,
+        Sum => G_out(18)
+        );
+        
+    Full_Adder_19: Full_Adder PORT MAP(
+        X => A(19),
+        Y => B(19),
+        Cin => C18,
+        Cout => C19,
+        Sum => G_out(19)
+        );
+        
+    Full_Adder_20: Full_Adder PORT MAP(
+        X => A(10),
+        Y => B(10),
+        Cin => C19,
+        Cout => C20,
+        Sum => G_out(20)
+        );
+        
+    Full_Adder_21: Full_Adder PORT MAP(
+        X => A(21),
+        Y => B(21),
+        Cin => C20,
+        Cout => C21,
+        Sum => G_out(21)
+        );
+        
+    Full_Adder_22: Full_Adder PORT MAP(
+        X => A(22),
+        Y => B(22),
+        Cin => C21,
+        Cout => C22,
+        Sum => G_out(22)
+        );
+        
+    Full_Adder_23: Full_Adder PORT MAP(
+        X => A(23),
+        Y => B(23),
+        Cin => C22,
+        Cout => C23,
+        Sum => G_out(23)
+        );
+        
+    Full_Adder_24: Full_Adder PORT MAP(
+        X => A(24),
+        Y => B(24),
+        Cin => C23,
+        Cout => C24,
+        Sum => G_out(24)
+        );
+        
+    Full_Adder_25: Full_Adder PORT MAP(
+        X => A(25),
+        Y => B(25),
+        Cin => C24,
+        Cout => C25,
+        Sum => G_out(25)
+        );
+        
+    Full_Adder_26: Full_Adder PORT MAP(
+        X => A(26),
+        Y => B(26),
+        Cin => C25,
+        Cout => C26,
+        Sum => G_out(26)
+        );
+        
+    Full_Adder_27: Full_Adder PORT MAP(
+        X => A(27),
+        Y => B(27),
+        Cin => C26,
+        Cout => C27,
+        Sum => G_out(27)
+        );
+        
+    Full_Adder_28: Full_Adder PORT MAP(
+        X => A(28),
+        Y => B(28),
+        Cin => C27,
+        Cout => C28,
+        Sum => G_out(28)
+        );
+        
+    Full_Adder_29: Full_Adder PORT MAP(
+        X => A(29),
+        Y => B(29),
+        Cin => C28,
+        Cout => C29,
+        Sum => G_out(29)
+        );
+        
+    Full_Adder_30: Full_Adder PORT MAP(
+        X => A(30),
+        Y => B(20),
+        Cin => C29,
+        Cout => C30,
+        Sum => G_out(30)
+        );
+        
+    Full_Adder_31: Full_Adder PORT MAP(
+        X => A(31),
+        Y => B(31),
+        Cin => C30,
+        Cout => C31,
+        Sum => G_out(31)
+        );
+        
+        
+      Cout <= C31;
+	  V_out <= (C30 xor C31);
+
+--    --carry
+--    Cout <= C_out;
+--    --overflow
+--    V_out <= (C_out xor C31);
+    
+end Behavioral;

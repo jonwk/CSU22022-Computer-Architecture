@@ -1,0 +1,471 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity Register_File is
+    Port ( add_A, add_B, add_D : in std_logic_vector(4 downto 0);
+            Clk : in std_logic;
+            load : in std_logic;
+            D_out_data : in std_logic_vector(31 downto 0);
+            A_out, B_out : out std_logic_vector(31 downto 0));
+            
+end Register_File;
+
+architecture Behavioral of Register_File is
+-- components
+-- 32 bit Register for register file
+    COMPONENT reg32
+    PORT(
+        D : IN std_logic_vector(31 downto 0);
+        load : IN std_logic_vector(1 downto 0);
+        Clk : IN std_logic;
+        Q : OUT std_logic_vector(31 downto 0)
+        );
+    END COMPONENT;
+    
+    -- 5 to 32 Decoder
+    COMPONENT decoder_5to32
+    PORT(   A0 : in std_logic;
+            A1 : in std_logic;
+            A2 : in std_logic;
+            A3 : in std_logic;
+            A4 : in std_logic;
+            
+            Q0 : out std_logic;
+            Q1 : out std_logic;
+            Q2 : out std_logic;
+            Q3 : out std_logic;
+            Q4 : out std_logic;
+            Q5 : out std_logic;
+            Q6 : out std_logic;
+            Q7 : out std_logic;
+            Q8 : out std_logic;
+            Q9 : out std_logic;
+            Q10 : out std_logic;
+            Q11 : out std_logic;
+            Q12 : out std_logic;
+            Q13 : out std_logic;
+            Q14 : out std_logic;
+            Q15 : out std_logic;
+            Q16 : out std_logic;
+            Q17 : out std_logic;
+            Q18 : out std_logic;
+            Q19 : out std_logic;
+            Q20 : out std_logic;
+            Q21 : out std_logic;
+            Q22 : out std_logic;
+            Q23 : out std_logic;
+            Q24 : out std_logic;
+            Q25 : out std_logic;
+            Q26 : out std_logic;
+            Q27 : out std_logic;
+            Q28 : out std_logic;
+            Q29 : out std_logic;
+            Q30 : out std_logic;
+            Q31 : out std_logic);
+    END COMPONENT;
+
+-- 32 to 1 line multiplexer (A_BUS, B_BUS)
+    COMPONENT MUX_32_32Bit
+    PORT(  In0, In1, In2, In3, In4, In5, In6, In7, In8, In9, In10, In11, In12, In13, In14, In15, In16, In17, In18, In19, In20, In21, In22, In23, In24, In25, In26, In27, In28, In29, In30, In31 : in std_logic_vector(31 downto 0);
+            S0, S1, S2, S3, S4 : in std_logic;
+            Z : out std_logic_vector(31 downto 0));
+    END COMPONENT;
+    
+    -- signals
+signal load_reg0,load_reg1, load_reg2, load_reg3, load_reg4, load_reg5, load_reg6, load_reg7, load_reg8, load_reg9, load_reg10, load_reg11, load_reg12, load_reg13, load_reg14, load_reg15,
+       load_reg16, load_reg17, load_reg18, load_reg19, load_reg20, load_reg21, load_reg22, load_reg23, load_reg24, load_reg25, load_reg26, load_reg27, load_reg28, load_reg29, load_reg30, load_reg31 : std_logic:='0';
+       
+signal reg0_q, reg1_q, reg2_q, reg3_q, reg4_q, reg5_q, reg6_q, reg7_q, reg8_q, reg9_q, reg10_q, reg11_q, reg12_q, reg13_q, reg14_q, reg15_q, reg16_q,
+       reg17_q, reg18_q, reg19_q, reg20_q, reg21_q, reg22_q, reg23_q, reg24_q, reg25_q, reg26_q, reg27_q, reg28_q, reg29_q, reg30_q, reg31_q, src_reg, out_sig_A, out_sig_B : std_logic_vector(31 downto 0):= (others => '0');
+
+        begin
+        -- port maps ;-)
+        -- register 0
+        reg00 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg0,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg0_q
+        );
+        -- register 1
+        reg01: reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg1,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg1_q
+        );
+        -- register 2
+        reg02 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg2,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg2_q
+        );
+        -- register 3
+        reg03 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg3,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg3_q
+        );
+        -- register 4
+        reg04 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg4,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg4_q
+        );
+        -- register 5
+        reg05: reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg5,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg5_q
+        );
+        -- register 6
+        reg06 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg6,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg6_q
+        );
+        -- register 7
+        reg07 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg7,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg7_q
+        );
+        -- register 8
+        reg08: reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg8,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg8_q
+        );
+        -- register 9
+        reg09 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg9,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg9_q
+        );
+        -- register 10
+        reg010 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg10,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg10_q
+        );
+        -- register 11
+        reg011: reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg11,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg11_q
+        );
+        -- register 12
+        reg012 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg12,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg12_q
+        );
+        -- register 13
+        reg013 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg13,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg13_q
+        );
+        -- register 14
+        reg014 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg14,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg14_q
+        );
+        -- register 15
+        reg015: reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg15,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg15_q
+        );
+        -- register 16
+        reg016 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg16,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg16_q
+        );
+        -- register 17
+        reg017 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg17,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg17_q
+        );
+        -- register 18
+        reg018: reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg18,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg18_q
+        );
+        -- register 19
+        reg019 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg19,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg19_q
+        );
+        -- register 20
+        reg020 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg20,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg20_q
+        );
+        -- register 21
+        reg021: reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg21,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg21_q
+        );
+        -- register 22
+        reg022 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg22,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg22_q
+        );
+        -- register 23
+        reg023 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg23,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg23_q
+        );
+        -- register 24
+        reg024 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg24,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg24_q
+        );
+        -- register 25
+        reg025: reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg25,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg25_q
+        );
+        -- register 26
+        reg026 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg26,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg26_q
+        );
+        -- register 27
+        reg027 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg27,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg27_q
+        );
+        -- register 28
+        reg028: reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg28,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg28_q
+        );
+        -- register 29
+        reg029 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg29,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg29_q
+        );
+        -- register 30
+        reg030 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg30,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg30_q
+        );
+        -- register 32
+        reg031 : reg32 PORT MAP(
+                    D => D_out_data,
+                    load(0) => load_reg31,
+                    load(1) => load,
+                    Clk => Clk,
+                    Q => reg31_q
+        );
+        -- Destination register decoder
+        add_Decoder_5to32: decoder_5to32 PORT MAP(
+                    A0 => add_D(0),
+                    A1 => add_D(1),
+                    A2 => add_D(2),
+                    A3 => add_D(3),
+                    A4 => add_D(4),
+                    
+                    Q0 => load_reg0,
+                    Q1 => load_reg1,
+                    Q2 => load_reg2,
+                    Q3 => load_reg3,
+                    Q4 => load_reg4,
+                    Q5 => load_reg5,
+                    Q6 => load_reg6,
+                    Q7 => load_reg7,
+                    Q8 => load_reg8,
+                    Q9 => load_reg9,
+                    Q10 => load_reg10,
+                    Q11 => load_reg11,
+                    Q12 => load_reg12,
+                    Q13 => load_reg13,
+                    Q14 => load_reg14,
+                    Q15 => load_reg15,
+                    Q16 => load_reg16,
+                    Q17 => load_reg17,
+                    Q18 => load_reg18,
+                    Q19 => load_reg19,
+                    Q20 => load_reg20,
+                    Q21 => load_reg21,
+                    Q22 => load_reg22,
+                    Q23 => load_reg23,
+                    Q24 => load_reg24,
+                    Q25 => load_reg25,
+                    Q26 => load_reg26,
+                    Q27 => load_reg27,
+                    Q28 => load_reg28,
+                    Q29 => load_reg29,
+                    Q30 => load_reg30,
+                    Q31 => load_reg31
+        );
+        -- 32 to 1 multiplexer for A
+        A_32_1_mux: MUX_32_32Bit PORT MAP(
+                    In0 => reg0_q,
+                    In1 => reg1_q,
+                    In2 => reg2_q,
+                    In3 => reg3_q,
+                    In4 => reg4_q,
+                    In5 => reg5_q,
+                    In6 => reg6_q,
+                    In7 => reg7_q,
+                    In8 => reg8_q,
+                    In9 => reg9_q,
+                    In10 => reg10_q,
+                    In11 => reg11_q,
+                    In12 => reg12_q,
+                    In13 => reg13_q,
+                    In14 => reg14_q,
+                    In15 => reg15_q,
+                    In16 => reg16_q,
+                    In17 => reg17_q,
+                    In18 => reg18_q,
+                    In19 => reg19_q,
+                    In20 => reg20_q,
+                    In21 => reg21_q,
+                    In22 => reg22_q,
+                    In23 => reg23_q,
+                    In24 => reg24_q,
+                    In25 => reg25_q,
+                    In26 => reg26_q,
+                    In27 => reg27_q,
+                    In28 => reg28_q,
+                    In29 => reg29_q,
+                    In30 => reg30_q,
+                    In31 => reg31_q,
+                    S0 => add_A(0),
+                    S1 => add_A(1),
+                    S2 => add_A(2),
+                    S3 => add_A(3),
+                    S4 => add_A(4),
+                    Z => A_out
+--                    Z => out_sig_A
+
+        );
+        -- 32 to 1 multiplexer for B
+        B_32_1_mux: MUX_32_32bit PORT MAP(
+                    In0 => reg0_q,
+                    In1 => reg1_q,
+                    In2 => reg2_q,
+                    In3 => reg3_q,
+                    In4 => reg4_q,
+                    In5 => reg5_q,
+                    In6 => reg6_q,
+                    In7 => reg7_q,
+                    In8 => reg8_q,
+                    In9 => reg9_q,
+                    In10 => reg10_q,
+                    In11 => reg11_q,
+                    In12 => reg12_q,
+                    In13 => reg13_q,
+                    In14 => reg14_q,
+                    In15 => reg15_q,
+                    In16 => reg16_q,
+                    In17 => reg17_q,
+                    In18 => reg18_q,
+                    In19 => reg19_q,
+                    In20 => reg20_q,
+                    In21 => reg21_q,
+                    In22 => reg22_q,
+                    In23 => reg23_q,
+                    In24 => reg24_q,
+                    In25 => reg25_q,
+                    In26 => reg26_q,
+                    In27 => reg27_q,
+                    In28 => reg28_q,
+                    In29 => reg29_q,
+                    In30 => reg30_q,
+                    In31 => reg31_q,
+                    S0 => add_B(0),
+                    S1 => add_B(1),
+                    S2 => add_B(2),
+                    S3 => add_B(3),
+                    S4 => add_B(4),
+--                    Z => out_sig_B
+                    Z => B_out
+        );
+        
+--        A_out <= out_sig_A;
+--        B_out <= out_sig_B;
+                  
+end Behavioral;

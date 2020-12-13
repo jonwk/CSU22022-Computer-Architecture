@@ -1,0 +1,78 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity Function_Unit is
+    Port ( A : in  STD_LOGIC_VECTOR(31 downto 0);
+           B : in  STD_LOGIC_VECTOR(31 downto 0);
+           FSel : in  STD_LOGIC_VECTOR(4 downto 0);
+           C : out  STD_LOGIC;
+           V : out  STD_LOGIC;
+           N : out  STD_LOGIC;
+           Z : out  STD_LOGIC;
+           F : out  STD_LOGIC_VECTOR(31 downto 0));
+end Function_Unit;
+
+architecture Behavioral of Function_Unit is
+-- Components
+    -- ALU
+    COMPONENT ALU_32Bit
+    PORT( A : in  STD_LOGIC_VECTOR(31 downto 0);
+          B : in  STD_LOGIC_VECTOR(31 downto 0);
+          GSel : in  STD_LOGIC_VECTOR(3 downto 0);
+          C : out  STD_LOGIC;
+          V : out  STD_LOGIC;
+          G : out  STD_LOGIC_VECTOR(31 downto 0));
+    END COMPONENT;
+    
+    -- Shifter
+    COMPONENT Shifter_32Bit
+    PORT( B : in  STD_LOGIC_VECTOR(31 downto 0);
+          S : in  STD_LOGIC_VECTOR(1 downto 0);
+          IR : in  STD_LOGIC;
+          IL : in  STD_LOGIC;
+          H : out  STD_LOGIC_VECTOR(31 downto 0));
+  END COMPONENT;
+  
+  -- MUX2
+  COMPONENT MUX_2_32Bit
+  PORT( IN0 : in  STD_LOGIC_VECTOR(31 downto 0);
+        IN1 : in  STD_LOGIC_VECTOR(31 downto 0);
+        S : in  STD_LOGIC;
+        Z : out  STD_LOGIC_VECTOR(31 downto 0));
+    END COMPONENT;
+    
+    signal ALUoutput, ShifterOutput, muxFOUT: STD_LOGIC_VECTOR(31 downto 0);
+    
+begin
+-- Port Maps
+    -- ALU
+    ALU: ALU_32Bit
+    PORT MAP(   A => A,
+                B => B,
+                GSel => FSel(3 downto 0),
+                C => C,
+                V => V,
+                G => ALUoutput);
+    
+    -- Shifter
+    SHIFTER: Shifter_32Bit
+    PORT MAP(   B => B,
+                S => FSel(3 downto 2),
+                IR => '0',
+                IL => '0',
+                H => ShifterOutput);
+                
+    -- MUXF
+    MUXF: MUX_2_32Bit
+    PORT MAP(   IN0 => ALUoutput,
+                IN1 => ShifterOutput,
+                S => FSel(4),
+                Z => muxFOUT);
+                
+    Z <= '1' when muxFOUT = x"00000000" else '0';
+    N <= '1' when muxFOUT(31) = '1' else '0';
+
+    F <= muxFOUT;
+end Behavioral;
