@@ -1,0 +1,24 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity ExtendedProgrammeCounter is
+    Port( SR_SB : in STD_LOGIC_VECTOR(9 downto 0);
+          ExtendedProgrammeCounter : out STD_LOGIC_VECTOR(31 downto 0)
+        );
+end ExtendedProgrammeCounter;
+
+architecture Behavioral of ExtendedProgrammeCounter is
+
+    signal extended_signal : STD_LOGIC_VECTOR(31 downto 0);
+
+begin
+    process(SR_SB)
+    begin
+        case SR_SB(9) is
+            when '0' => ExtendedProgrammeCounter <= "00" & x"00000" & SR_SB after 1ns;
+            when '1' => ExtendedProgrammeCounter <= "11" & x"fffff" & SR_SB after 1ns;
+            when others => ExtendedProgrammeCounter <= x"00000000" after 1ns;
+        end case;
+    end process;
+
+end Behavioral;

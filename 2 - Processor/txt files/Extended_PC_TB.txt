@@ -1,0 +1,49 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+
+ENTITY ExtendedProgrammeCounter_TB IS
+END ExtendedProgrammeCounter_TB;
+
+ARCHITECTURE behavior OF ExtendedProgrammeCounter_TB IS
+
+    -- Component Declaration for the Unit Under Test (UUT)
+    COMPONENT ExtendedProgrammeCounter
+    PORT(
+        SR_SB : IN std_logic_vector(9 downto 0);
+        ExtendedProgrammeCounter : OUT std_logic_vector(31 downto 0)
+        );
+    END COMPONENT;
+
+
+    --Inputs
+    signal SR_SB : std_logic_vector(9 downto 0) := (others => '0');
+    
+    --Outputs
+    signal ExtendedProgrammeCounter_sig : std_logic_vector(31 downto 0);
+
+BEGIN
+
+    -- Instantiate the Unit Under Test (UUT)
+    uut: ExtendedProgrammeCounter PORT MAP (
+            SR_SB => SR_SB,
+            ExtendedProgrammeCounter => ExtendedProgrammeCounter_sig
+        );
+    
+    -- Stimulus process
+    stim_proc: process
+    begin
+        wait for 200ns;
+        SR_SB <= "1101011110";
+    
+        wait for 200ns;
+        SR_SB <= "1111011110";
+        
+        wait for 200ns;
+        SR_SB <= "0101011010";
+        
+        wait for 200ns;
+        SR_SB <= "1111111111";
+
+--        wait;
+    end process;
+END;

@@ -1,0 +1,104 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity Arithmetic_Unit_TB is
+end Arithmetic_Unit_TB;
+
+architecture Behavioral of Arithmetic_Unit_TB is
+
+COMPONENT Arithmetic_Unit
+    PORT(
+           A : in  STD_LOGIC_VECTOR(31 downto 0);
+           B : in  STD_LOGIC_VECTOR(31 downto 0);
+           Cin : in  STD_LOGIC;
+           SelB : in  STD_LOGIC_VECTOR(1 downto 0);
+           G : out  STD_LOGIC_VECTOR(31 downto 0);
+           Cout : out  STD_LOGIC;
+           V_out : out  STD_LOGIC);
+    END COMPONENT;
+    
+
+   --Inputs
+   signal A : std_logic_vector(31 downto 0) := (others => '0');
+   signal B : std_logic_vector(31 downto 0) := (others => '0');
+   signal Cin : std_logic := '0';
+   signal SelB : std_logic_vector(1 downto 0) := (others => '0');
+
+    --Outputs
+   signal G : std_logic_vector(31 downto 0);
+   signal Cout : std_logic;
+   signal V_out : std_logic;
+ 
+BEGIN
+ 
+    -- Instantiate the Unit Under Test (UUT)
+   uut: Arithmetic_Unit PORT MAP (
+          A => A,
+          B => B,
+          Cin => Cin,
+          SelB => SelB,
+          G => G,
+          Cout => Cout,
+          V_out => V_out
+        );
+
+   -- Stimulus process
+   stim_proc: process
+   begin        
+        A <= x"00000002";
+        B <= x"00000001";
+        wait for 100ns;
+        
+        -- G = A (Transfer)
+        SelB(0) <= '0';
+        SelB(1) <= '0';
+        Cin <= '0';
+        wait for 100ns;
+        
+        -- G = A + 1 or A++ (Increment)
+        SelB(0) <= '0';
+        SelB(1) <= '0';
+        Cin <= '1';
+        wait for 100ns;
+        
+        -- G = A + B (Add)
+        SelB(0) <= '1';
+        SelB(1) <= '0';
+        Cin <= '0';
+        wait for 100ns;
+        
+        -- G = A + B + 1
+        SelB(0) <= '1';
+        SelB(1) <= '0';
+        Cin <= '1';
+        wait for 100ns;
+        
+        -- G = A + not(B)
+        SelB(0) <= '0';
+        SelB(1) <= '1';
+        Cin <= '0';
+        wait for 100ns;
+        
+        -- G = A + not(B) + 1 (Subtract)
+        SelB(0) <= '0';
+        SelB(1) <= '1';
+        Cin <= '1';
+        wait for 100ns;
+        
+        -- G = A - 1 or A-- (Decrement)
+        SelB(0) <= '1';
+        SelB(1) <= '1';
+        Cin <= '0';
+        wait for 100ns;
+        
+        -- G = A (Transfer)
+        SelB(0) <= '1';
+        SelB(1) <= '1';
+        Cin <= '1';
+        wait for 100ns;
+        
+   end process;
+
+END;

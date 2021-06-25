@@ -1,0 +1,45 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+
+ENTITY MUX_2_17Bit_TB IS
+END MUX_2_17Bit_TB;
+
+ARCHITECTURE behavior OF MUX_2_17Bit_TB IS
+    
+    -- Component Declaration for the Unit Under Test (UUT)
+    COMPONENT MUX_2_17Bit
+    PORT(
+    In0_NA : IN std_logic_vector(16 downto 0);
+    In1_opcode : IN std_logic_vector(16 downto 0);
+    S_mc : IN std_logic;
+    out_car : OUT std_logic_vector(16 downto 0)
+    );
+    END COMPONENT;
+
+    --Inputs
+    signal In0_NA : std_logic_vector(16 downto 0) := (others => '0');
+    signal In1_opcode : std_logic_vector(16 downto 0) := (others => '0');
+    signal S_mc : std_logic := '0';
+
+    --Outputs
+    signal out_car : std_logic_vector(16 downto 0);
+    
+BEGIN
+    -- Instantiate the Unit Under Test (UUT)
+    uut: MUX_2_17Bit PORT MAP (
+        In0_NA => In0_NA,
+        In1_opcode => In1_opcode,
+        S_mc => S_mc,
+        out_car => out_car
+        );
+    
+    -- Stimulus process
+    stim_proc: process
+    begin
+        In0_NA <= "10000000000000001";
+        In1_opcode <= "00000011111110000";
+        wait for 500ns;
+        S_mc <= '1';
+--        wait;
+    end process;
+END;

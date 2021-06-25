@@ -1,0 +1,61 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+entity CAR_TB is
+end CAR_TB;
+
+architecture Behavioral of CAR_TB is
+
+    COMPONENT CAR
+    Port( CAR_in : in STD_LOGIC_VECTOR(16 downto 0);
+        MUX_S, reset: in STD_LOGIC;
+        clk : in STD_LOGIC;
+        CAR_out : out STD_LOGIC_VECTOR(16 downto 0)
+        );
+    END COMPONENT;
+    
+    --Inputs
+    signal CAR_in : std_logic_vector(16 downto 0) := (others => '0');
+    signal MUX_S : std_logic := '0';
+    signal reset : std_logic := '0';
+    signal clk : std_logic := '0'; -- with clock
+
+    --Outputs
+    signal CAR_out : std_logic_vector(16 downto 0);
+    
+
+BEGIN
+
+-- Instantiate the Unit Under Test (UUT)
+uut: CAR PORT MAP (
+        CAR_in => CAR_in,
+        MUX_S => MUX_S,
+        reset => reset,
+        clk => clk,
+        CAR_out => CAR_out
+        );
+
+    -- Stimulus process
+    stim_proc: process
+    begin
+    
+        reset <= '1';
+        wait for 150ns;
+        
+        reset <= '0';
+        wait for 150ns;
+        
+        MUX_S <= '1';
+        reset <= '0';
+        CAR_in <= b"0_0000_0000_0000_1111";
+        wait for 150ns;
+        
+        MUX_S <= '0';
+        CAR_in <= b"0_0000_0000_0000_0000";
+        wait for 150ns;
+        
+        wait;
+    end process;
+
+END;

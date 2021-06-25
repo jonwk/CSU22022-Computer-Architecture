@@ -1,0 +1,193 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity MicroprogrammeController is
+    Port(   IR : in STD_LOGIC_VECTOR(31 downto 0);
+            status_bits : in STD_LOGIC_VECTOR(3 downto 0);
+            reset_mpc : in STD_LOGIC;
+            clk_mpc : in STD_LOGIC;
+            control_word_mpc : out STD_LOGIC_VECTOR(23 downto 0);
+            PC_out : out STD_LOGIC_VECTOR(31 downto 0);
+            TD_mpc, TA_mpc, TB_mpc, MW_mpc : out STD_LOGIC
+        );
+end MicroprogrammeController;
+
+architecture Behavioral of MicroprogrammeController is
+    component ControlMemory is
+        Port (  FL, RZ, RN, RC, RV, MW, MM, RW, MD, MB, TB, TA, TD, PL, PI, IL, MC: out std_logic;
+                FS : out std_logic_vector(4 downto 0);
+                MS : out std_logic_vector(2 downto 0);
+                NA : out std_logic_vector(16 downto 0); 
+                IN_CAR : in unsigned(16 downto 0));
+    end component;
+
+    component MUX_2_17Bit is
+    Port(   In0_NA, In1_opcode : in STD_LOGIC_VECTOR(16 downto 0);
+            S_mc : in STD_LOGIC;
+            out_car : out STD_LOGIC_VECTOR(16 downto 0)
+        );
+    end component;
+
+    COMPONENT MUX8_1Bit
+    Port (  In_zero, In_one, In_n, In_z, In_c, In_v, In_not_c, In_not_z : in STD_LOGIC;
+            S : in  STD_LOGIC_VECTOR(2 downto 0);
+            Z : out  STD_LOGIC);
+    END COMPONENT;
+
+    component CAR is
+        Port(   CAR_in : in STD_LOGIC_VECTOR(16 downto 0);
+                MUX_S, reset : in STD_LOGIC; 
+                clk : in STD_LOGIC; 
+                CAR_out : out STD_LOGIC_VECTOR(16 downto 0)
+            );
+    end component;
+
+    component InstructionRegister is
+        Port ( INSTR : in  STD_LOGIC_VECTOR(31 downto 0);   
+               IL : in  STD_LOGIC;
+               OPCODE : out  STD_LOGIC_VECTOR(16 downto 0);
+               DR : out  STD_LOGIC_VECTOR(4 downto 0);
+               SA : out  STD_LOGIC_VECTOR(4 downto 0);
+               SB : out  STD_LOGIC_VECTOR(4 downto 0));
+    end component;
+
+    component ProgrammeCounter is
+       Port( PC_in : in STD_LOGIC_VECTOR(31 downto 0);
+          PC_load, PC_increment : in STD_LOGIC;
+          reset : in std_logic;
+          clock : in std_logic;
+          PC_out : out STD_LOGIC_VECTOR(31 downto 0)
+        );
+    end component;
+ 
+    component ExtendedProgrammeCounter is
+    Port( SR_SB : in STD_LOGIC_VECTOR(9 downto 0);
+          ExtendedProgrammeCounter : out STD_LOGIC_VECTOR(31 downto 0)
+        );
+    end component;
+
+    --signalling
+    signal control_word_sig : STD_LOGIC_VECTOR(23 downto 0):= (others => '0');
+    
+    -- CM and MUX-C
+    signal na_sig : STD_LOGIC_VECTOR(16 downto 0):= (others => '0');
+    
+    --CM and CAR
+    signal car_out_sig : STD_LOGIC_VECTOR(16 downto 0):= (others => '0');
+    
+    --MUX C
+    signal opcode_sig : STD_LOGIC_VECTOR(16 downto 0):= (others => '0');
+    
+    --MUX C and CAR
+    signal  out_car_sig : STD_LOGIC_VECTOR(16 downto 0):= (others => '0');
+    
+    signal out_s_car_sig, mc_sig : STD_LOGIC :='0';
+    
+    -- CM and IR
+    signal il_sig : STD_LOGIC :='0';
+    -- CM and PC
+    signal pl_sig, pi_sig : STD_LOGIC := '0';
+    
+    -- MS in CM and in MUX S (MUX 8)
+    signal ms_cm_sig: STD_LOGIC_VECTOR(2 downto 0):= (others => '0');
+    
+    -- IR
+    signal sa_sig, sb_sig, dr_sig : STD_LOGIC_VECTOR(4 downto 0):= (others => '0');
+    
+    -- Extended PC
+    signal extend_in : STD_LOGIC_VECTOR(9 downto 0):= (others => '0');
+    signal extend_out : STD_LOGIC_VECTOR(31 downto 0):= (others => '0');
+    
+    -- MUX 8
+    signal not_c, not_z : std_logic :='0';
+    
+begin
+    control_memory_mpc : ControlMemory PORT MAP(
+        IN_CAR => unsigned(car_out_sig(16 downto 0)),
+        MW => mw_mpc,
+        MM => control_word_sig(0),
+        RW => control_word_sig(1),
+        MD => control_word_sig(2),
+        MB => control_word_sig(8),
+        TB => tb_mpc,
+        TA => ta_mpc,
+        TD => td_mpc,
+        PL => pl_sig,
+        PI => pi_sig,
+        IL => il_sig,
+        MC => mc_sig,
+        FS => control_word_sig(7 downto 3),
+        MS => ms_cm_sig,
+        NA => na_sig
+    );
+
+    mux2_17_mpc : MUX_2_17Bit PORT MAP(
+        In0_NA => na_sig,
+        In1_opcode => opcode_sig,
+        S_mc => mc_sig,
+        out_car => out_car_sig
+    );
+    
+    not_z <= NOT status_bits(0);
+    not_c <= NOT status_bits(2);
+    
+    mux8_1_mpc : MUX8_1Bit PORT MAP(
+        In_zero => '0',
+        In_one => '1',
+        In_z => status_bits(0),
+        In_n => status_bits(1),
+        In_c => status_bits(2),
+        In_v => status_bits(3),
+        In_not_z => not_z,
+        In_not_c => not_c,
+        S => ms_cm_sig,
+        Z => out_s_car_sig
+    );
+    
+    car_mpc : CAR PORT MAP(
+        CAR_in => out_car_sig,
+        MUX_S => out_s_car_sig,
+        reset => reset_mpc,
+        clk => clk_mpc,
+        CAR_out => car_out_sig
+    );
+    
+    IR_mpc : InstructionRegister PORT MAP(
+        INSTR => IR,
+        IL => il_sig,
+        Opcode => opcode_sig(16 downto 0),
+        DR => dr_sig,
+        SA => sa_sig,
+        SB => sb_sig
+    );
+    
+--    extend_in(9 downto 0) <= dr_sig & sb_sig;    
+    
+    extended_pc_mpc : ExtendedProgrammeCounter PORT MAP(
+        SR_SB => extend_in,
+        ExtendedProgrammeCounter => extend_out
+    );
+    
+    pc_mpc : ProgrammeCounter PORT MAP(
+        PC_in => extend_out,
+        PC_load => pl_sig,
+        PC_increment => pi_sig,
+        reset => reset_mpc,
+        clock => clk_mpc,
+        PC_out => pc_out
+    );
+    
+
+    extend_in(9 downto 5) <= dr_sig;
+    extend_in(4 downto 0) <= sb_sig;
+    
+    control_word_sig(23 downto 19) <= dr_sig;
+    control_word_sig(18 downto 14) <= sa_sig;
+    control_word_sig(13 downto 9) <= sb_sig;
+--    control_word_sig(23 downto 9) <= dr_sig & sa_sig & sb_sig;
+    
+    control_word_mpc <= control_word_sig;
+    
+end Behavioral;

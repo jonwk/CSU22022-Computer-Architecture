@@ -1,0 +1,121 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity Datapath_32Bit is
+    Port ( 
+           CONTROL_WORD : in  STD_LOGIC_VECTOR(23 downto 0);
+           CONST_IN : in  STD_LOGIC_VECTOR(31 downto 0);
+           DATA_IN : in  STD_LOGIC_VECTOR(31 downto 0);
+           CLK : in  STD_LOGIC;
+           TD, TA, TB : in STD_LOGIC;
+           ADDR_OUT : out  STD_LOGIC_VECTOR(31 downto 0);
+           DATA_OUT : out  STD_LOGIC_VECTOR(31 downto 0);
+           status_out : out STD_LOGIC_VECTOR(3 downto 0)
+           );
+end Datapath_32Bit;
+
+architecture Behavioral of Datapath_32Bit is
+-- Components
+    -- Regfile
+    COMPONENT Register_File
+    PORT(   add_A, add_B, add_D : in std_logic_vector(5 downto 0);
+            Clk : in std_logic;
+            load : in std_logic;
+            D_out_data : in std_logic_vector(31 downto 0);
+            A_out, B_out: out std_logic_vector(31 downto 0));
+    END COMPONENT;
+    
+    -- Function Unit
+    COMPONENT Function_Unit
+    PORT( A : in  STD_LOGIC_VECTOR(31 downto 0);
+          B : in  STD_LOGIC_VECTOR(31 downto 0);
+          FSel : in  STD_LOGIC_VECTOR(4 downto 0);
+          C : out  STD_LOGIC;
+          V : out  STD_LOGIC;
+          N : out  STD_LOGIC;
+          Z : out  STD_LOGIC;
+          F : out  STD_LOGIC_VECTOR(31 downto 0));
+    END COMPONENT;
+    
+    -- Mux2
+    COMPONENT MUX_2_32Bit
+    PORT( IN0 : in  STD_LOGIC_VECTOR(31 downto 0);
+          IN1 : in  STD_LOGIC_VECTOR(31 downto 0);
+          S : in  STD_LOGIC;
+          Z : out  STD_LOGIC_VECTOR(31 downto 0));
+    END COMPONENT;
+    
+    COMPONENT ZeroFill is
+    Port( SB_in : in STD_LOGIC_VECTOR(4 downto 0);
+        ZeroFill_out : out STD_LOGIC_VECTOR(31 downto 0)
+        );
+    end COMPONENT;
+
+    signal B_regfile_muxB, muxB_out, muxM_out, A_regfile_Function_Unit, Function_Unit_out, muxD_out,
+            zero_fill_out, pc_sig: STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+    
+    signal dest_d, addr_a, addr_b : STD_LOGIC_VECTOR(5 downto 0) ;
+--    
+begin
+-- Port Maps
+-- MUXB
+    MUXB: MUX_2_32Bit
+    PORT MAP(   IN0 => B_regfile_muxB,
+                IN1 => CONST_IN,
+                S => CONTROL_WORD(8),
+                Z => muxB_out);
+  
+--MUXD
+    MUXD: MUX_2_32Bit
+    PORT MAP(   IN0 => Function_Unit_out,
+                IN1 => DATA_IN,
+                S => CONTROL_WORD(2),
+                Z => muxD_out);
+   
+   pc_sig <= CONST_IN;
+                
+--MUXM
+    MUXM: MUX_2_32Bit
+    PORT MAP(   IN0 => A_regfile_Function_Unit,
+                IN1 => pc_sig,
+                S => CONTROL_WORD(0),
+                Z => muxM_out);
+    
+    dest_d <= TD & CONTROL_WORD(23 downto 19);
+    addr_a <= TA & CONTROL_WORD(18 downto 14);
+    addr_b <= TB & CONTROL_WORD(13 downto 9);
+
+-- Zero Fill
+    zero_fill: ZeroFill
+    PORT MAP( SB_in => CONTROL_WORD(13 downto 9),
+              ZeroFill_out  => zero_fill_out
+             );         
+-- Regfile
+    REGFILE: Register_File
+    PORT MAP(
+                add_A => addr_a,
+                add_B => addr_b,
+                add_D => dest_d,
+                CLK => CLK,
+                load => CONTROL_WORD(1),
+                D_out_data => muxD_out,
+                A_out => A_regfile_Function_Unit,
+                B_out => B_regfile_muxB
+                );
+   -- Function Unit
+    FUNC_UNIT: Function_Unit
+    PORT MAP(   A => A_regfile_Function_Unit,
+                B => muxB_out,
+                FSel => CONTROL_WORD(7 downto 3),
+                C =>  status_out(2),
+                V =>  status_out(3),
+                N =>  status_out(1),
+                Z =>  status_out(0),
+                F => Function_Unit_out);
+
+-- Signals          
+    ADDR_OUT <= muxM_out;
+    DATA_OUT <= muxB_out;      
+end Behavioral;

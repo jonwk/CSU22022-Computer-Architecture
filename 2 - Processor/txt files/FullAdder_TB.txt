@@ -1,0 +1,86 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity FullAdder_TB is
+end FullAdder_TB;
+
+architecture Behavioral of FullAdder_TB is
+
+    COMPONENT Full_Adder
+    PORT(
+         X : IN  std_logic;
+         Y : IN  std_logic;
+         Cin : IN  std_logic;
+         Sum : OUT  std_logic;
+         Cout : OUT  std_logic
+        );
+    END COMPONENT;
+    
+   -- Input signals
+   signal X : std_logic := '0';
+   signal Y : std_logic := '0';
+   signal Cin : std_logic := '0';
+
+    -- Outputs signals
+   signal Sum : std_logic;
+   signal Cout : std_logic;
+ 
+BEGIN
+ 
+    -- Instantiate the Unit Under Test (UUT)
+   uut: Full_Adder PORT MAP (
+          X => X,
+          Y => Y,
+          Cin => Cin,
+          Sum => Sum,
+          Cout => Cout
+        );
+          
+  -- Stimulus process
+   stim_proc: process
+   begin        
+        Cin <= '0';
+        Y <= '0';
+        X <= '0';
+        wait for 100ns;
+        
+        Cin <= '0';
+        Y <= '0';
+        X <= '1';
+        wait for 100ns;
+        
+        Cin <= '0';
+        Y <= '1';
+        X <= '0';
+        wait for 100ns;
+        
+        Cin <= '0';
+        Y <= '1';
+        X <= '1';
+        wait for 100ns;
+        
+        Cin <= '1';
+        Y <= '0';
+        X <= '0';
+        wait for 100ns;
+        
+        Cin <= '1';
+        Y <= '0';
+        X <= '1';
+        wait for 100ns;
+        
+        Cin <= '1';
+        Y <= '1';
+        X <= '0';
+        wait for 100ns;
+        
+        Cin <= '1';
+        Y <= '1';
+        X <= '1';
+        wait for 100ns;
+        
+   end process;
+
+END;

@@ -1,0 +1,70 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+
+ENTITY ProgrammeCounter_TB IS
+END ProgrammeCounter_TB;
+
+ARCHITECTURE behavior OF ProgrammeCounter_TB IS
+
+    -- Component Declaration for the Unit Under Test (UUT)
+    COMPONENT ProgrammeCounter
+    Port( PC_in : in STD_LOGIC_VECTOR(31 downto 0);
+          PC_load, PC_increment : in STD_LOGIC;
+          reset : in std_logic;
+          clock : in std_logic;
+          PC_out : out STD_LOGIC_VECTOR(31 downto 0)
+        );
+    END COMPONENT;
+    
+    --Inputs
+    signal PC_in : std_logic_vector(31 downto 0) := (others => '0');
+    signal PC_load : std_logic := '0';
+    signal PC_increment : std_logic := '0';
+    signal reset : std_logic := '0';
+    signal clock: std_logic := '0';
+    
+    --Outputs
+    signal PC_out : std_logic_vector(31 downto 0);
+
+    
+BEGIN
+
+    -- Instantiate the Unit Under Test (UUT)
+    uut: ProgrammeCounter PORT MAP (
+            PC_in => PC_in,
+            PC_load => PC_load,
+            PC_increment => PC_increment,
+            reset => reset,
+            clock => clock,
+            PC_out => PC_out
+    );
+    
+    -- Stimulus process
+    clock <= not clock after 25ns; 
+    stim_proc: process
+    begin
+        reset <= '1';
+        wait for 100ns;
+        
+        reset <= '0';
+        PC_load <= '0';
+        PC_increment <= '1';
+        
+        wait for 200ns;
+        PC_in <= x"00001111";
+        PC_load <= '1';
+        PC_increment <= '0';
+        
+        wait for 100ns;
+        PC_in <= x"0000ffff";
+        PC_load <= '1';
+        PC_increment <= '0';
+        
+        wait for 100ns;
+        PC_load <= '0';
+        PC_increment <= '0';
+
+        wait;
+    end process;
+   
+END;

@@ -1,0 +1,452 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+ 
+ENTITY decoder_6to33_tb IS
+END decoder_6to33_tb;
+ 
+ARCHITECTURE behavior OF decoder_6to33_tb IS 
+ 
+    -- Component Declaration for the Unit Under Test (UUT)
+ 
+    COMPONENT decoder_6to33
+    PORT(   A0 : in std_logic;
+            A1 : in std_logic;
+            A2 : in std_logic;
+            A3 : in std_logic;
+            A4 : in std_logic;
+            A5 : in std_logic;
+            
+            Q0 : out std_logic;
+            Q1 : out std_logic;
+            Q2 : out std_logic;
+            Q3 : out std_logic;
+            Q4 : out std_logic;
+            Q5 : out std_logic;
+            Q6 : out std_logic;
+            Q7 : out std_logic;
+            Q8 : out std_logic;
+            Q9 : out std_logic;
+            Q10 : out std_logic;
+            Q11 : out std_logic;
+            Q12 : out std_logic;
+            Q13 : out std_logic;
+            Q14 : out std_logic;
+            Q15 : out std_logic;
+            Q16 : out std_logic;
+            Q17 : out std_logic;
+            Q18 : out std_logic;
+            Q19 : out std_logic;
+            Q20 : out std_logic;
+            Q21 : out std_logic;
+            Q22 : out std_logic;
+            Q23 : out std_logic;
+            Q24 : out std_logic;
+            Q25 : out std_logic;
+            Q26 : out std_logic;
+            Q27 : out std_logic;
+            Q28 : out std_logic;
+            Q29 : out std_logic;
+            Q30 : out std_logic;
+            Q31 : out std_logic;
+            Q32 : out std_logic);
+    END COMPONENT;
+    
+
+   --Inputs
+   signal A0 : std_logic;
+   signal A1 : std_logic;
+   signal A2 : std_logic;
+   signal A3 : std_logic;
+   signal A4 : std_logic;
+   signal A5 : std_logic;
+            
+ 	--Outputs
+   signal Q0 : std_logic ;
+   signal Q1 : std_logic;
+   signal Q2 : std_logic;
+   signal Q3 : std_logic;
+   signal Q4 : std_logic;
+   signal Q5 : std_logic;
+   signal Q6 : std_logic;
+   signal Q7 : std_logic;
+   signal Q8 : std_logic;
+   signal Q9 : std_logic;
+   signal Q10 : std_logic;
+   signal Q11 : std_logic;
+   signal Q12 : std_logic;
+   signal Q13 : std_logic;
+   signal Q14 : std_logic;
+   signal Q15 : std_logic;
+   signal Q16 : std_logic;
+   signal Q17 : std_logic;
+   signal Q18 : std_logic;
+   signal Q19 : std_logic;
+   signal Q20 : std_logic;
+   signal Q21 : std_logic;
+   signal Q22 : std_logic;
+   signal Q23 : std_logic;
+   signal Q24 : std_logic;
+   signal Q25 : std_logic;
+   signal Q26 : std_logic;
+   signal Q27 : std_logic;
+   signal Q28 : std_logic;
+   signal Q29 : std_logic;
+   signal Q30 : std_logic;
+   signal Q31 : std_logic;
+   signal Q32 : std_logic;
+
+   -- No clocks detected in port list. Replace <clock> below with 
+   -- appropriate port name 
+ 
+--   constant Clk_period : time := 5 ns;
+ 
+BEGIN
+ 
+	-- Instantiate the Unit Under Test (UUT)
+uut: decoder_6to33 PORT MAP (
+   A0 => A0,
+   A1 => A1,
+   A2 => A2,
+   A3 => A3,
+   A4 => A4,
+   A5 => A5,
+   
+   Q0 => Q0,
+   Q1 => Q1,
+   Q2 => Q2,
+   Q3 => Q3,
+   Q4 => Q4,
+   Q5 => Q5,
+   Q6 => Q6,
+   Q7 => Q7,
+   Q8 => Q8,
+   Q9 => Q9,
+   Q10 => Q10,
+   Q11 => Q11,
+   Q12 => Q12,
+   Q13 => Q13,
+   Q14 => Q14,
+   Q15 => Q15,
+   Q16 => Q16,
+   Q17 => Q17,
+   Q18 => Q18,
+   Q19 => Q19,
+   Q20 => Q20,
+   Q21 => Q21,
+   Q22 => Q22,
+   Q23 => Q23,
+   Q24 => Q24,
+   Q25 => Q25,
+   Q26 => Q26,
+   Q27 => Q27,
+   Q28 => Q28,
+   Q29 => Q29,
+   Q30 => Q30,
+   Q31 => Q31,
+   Q32 => Q32
+        );
+
+   stim_proc: process
+   begin
+   
+--     0 - 000000  
+       wait for 29 ns;
+       A0 <= '0';
+       A1 <= '0';
+       A2 <= '0';
+       A3 <= '0';
+       A4 <= '0';
+       A5 <= '0';
+       
+--     1 - 000010
+       wait for 29 ns;
+       A0 <= '0';
+       A1 <= '0';
+       A2 <= '0';
+       A3 <= '0';
+       A4 <= '1';
+       A5 <= '0';
+       
+--     2 - 000100 
+       wait for 29 ns;
+       A0 <= '0';
+       A1 <= '0';
+       A2 <= '0';
+       A3 <= '1';
+       A4 <= '0';
+       A5 <= '0';
+       
+--     3 - 000110
+       wait for 29 ns; 
+       A0 <= '0';
+       A1 <= '0';
+       A2 <= '0';
+       A3 <= '1';
+       A4 <= '1';
+       A5 <= '0';
+       
+--     4 - 001000
+       wait for 29 ns;
+       A0 <= '0';
+       A1 <= '0';
+       A2 <= '1';
+       A3 <= '0';
+       A4 <= '0';
+       A5 <= '0';
+       
+ --    5 - 001010
+       wait for 29 ns;
+       A0 <= '0';
+       A1 <= '0';
+       A2 <= '1';
+       A3 <= '0';
+       A4 <= '1';
+       A5 <= '0';
+       
+--     6 - 001100
+       wait for 29 ns;
+       A0 <= '0';
+       A1 <= '0';
+       A2 <= '1';
+       A3 <= '1';
+       A4 <= '0';
+       A5 <= '0';
+       
+--      7 - 001110
+        wait for 29 ns;
+       A0 <= '0';
+       A1 <= '0';
+       A2 <= '1';
+       A3 <= '1';
+       A4 <= '1';
+       A5 <= '0';
+
+--     8 - 010000
+       wait for 29 ns;
+       A0 <= '0';
+       A1 <= '1';
+       A2 <= '0';
+       A3 <= '0';
+       A4 <= '0';
+       A5 <= '0';
+       
+--     9 - 010010 
+       wait for 29 ns;
+       A0 <= '0';
+       A1 <= '1';
+       A2 <= '0';
+       A3 <= '0';
+       A4 <= '1';
+       A5 <= '0';
+       
+--     10 - 010100 
+       wait for 29 ns; 
+       A0 <= '0';
+       A1 <= '1';
+       A2 <= '0';
+       A3 <= '1';
+       A4 <= '0';
+       A5 <= '0';
+       
+--      11- 010110
+       wait for 29 ns;
+       A0 <= '0';
+       A1 <= '1';
+       A2 <= '0';
+       A3 <= '1';
+       A4 <= '1';
+       A5 <= '0';
+       
+--     12 - 011000 
+       wait for 29 ns;  
+       A0 <= '0';
+       A1 <= '1';
+       A2 <= '1';
+       A3 <= '0';
+       A4 <= '0';
+       A5 <= '0';
+       
+--      13- 011010 
+       wait for 29 ns; 
+       A0 <= '0';
+       A1 <= '1';
+       A2 <= '1';
+       A3 <= '0';
+       A4 <= '1';
+       A5 <= '0';
+       
+--     14 - 011100  
+       wait for 29 ns;
+       A0 <= '0';
+       A1 <= '1';
+       A2 <= '1';
+       A3 <= '1';
+       A4 <= '0';
+       A5 <= '0';
+       
+ --    15 - 011110
+       wait for 29 ns;   
+       A0 <= '0';
+       A1 <= '1';
+       A2 <= '1';
+       A3 <= '1';
+       A4 <= '1';
+       A5 <= '0';
+       
+--     16 - 100000
+       wait for 29 ns;
+       A0 <= '1';
+       A1 <= '0';
+       A2 <= '0';
+       A3 <= '0';
+       A4 <= '0';
+       A5 <= '0';
+       
+--      17 - 100010 
+       wait for 29 ns;
+       A0 <= '1';
+       A1 <= '0';
+       A2 <= '0';
+       A3 <= '0';
+       A4 <= '1';
+       A5 <= '0';
+
+--      18 - 100100
+       wait for 29 ns;
+       A0 <= '1';
+       A1 <= '0';
+       A2 <= '0';
+       A3 <= '1';
+       A4 <= '0';
+       A5 <= '0';
+      
+--      19 - 100110 
+       wait for 29 ns; 
+       A0 <= '1';
+       A1 <= '0';
+       A2 <= '0';
+       A3 <= '1';
+       A4 <= '1';
+       A5 <= '0';
+       
+--      20 - 101000 
+       wait for 29 ns;
+       A0 <= '1';
+       A1 <= '0';
+       A2 <= '1';
+       A3 <= '0';
+       A4 <= '0';
+       A5 <= '0';
+       
+--     21 - 101010
+       wait for 29 ns;
+       A0 <= '1';
+       A1 <= '0';
+       A2 <= '1';
+       A3 <= '0';
+       A4 <= '1';
+       A5 <= '0';
+       
+--      22 - 101100
+       wait for 29 ns;
+       A0 <= '1';
+       A1 <= '0';
+       A2 <= '1';
+       A3 <= '1';
+       A4 <= '0';
+       A5 <= '0';
+       
+--      23 - 101110
+       wait for 29 ns;
+       A0 <= '1';
+       A1 <= '0';
+       A2 <= '1';
+       A3 <= '1';
+       A4 <= '1';
+       A5 <= '0';
+       
+--     24 - 110000
+       wait for 29 ns;
+       A0 <= '1';
+       A1 <= '1';
+       A2 <= '0';
+       A3 <= '0';
+       A4 <= '0';
+       A5 <= '0';
+       
+ --     25 - 110010
+        wait for 29 ns;
+       A0 <= '1';
+       A1 <= '1';
+       A2 <= '0';
+       A3 <= '0';
+       A4 <= '1';
+       A5 <= '0';
+       
+--     26 - 110100
+       wait for 29 ns;
+       A0 <= '1';
+       A1 <= '1';
+       A2 <= '0';
+       A3 <= '1';
+       A4 <= '0';
+       A5 <= '0';
+       
+--     27 - 110110 
+       wait for 29 ns;
+       A0 <= '1';
+       A1 <= '1';
+       A2 <= '0';
+       A3 <= '1';
+       A4 <= '1';
+       A5 <= '0';
+       
+--      28 - 111000
+       wait for 29 ns;
+       A0 <= '1';
+       A1 <= '1';
+       A2 <= '1';
+       A3 <= '0';
+       A4 <= '0';
+       A5 <= '0';
+       
+--      29 - 111010
+       wait for 29 ns;   
+       A0 <= '1';
+       A1 <= '1';
+       A2 <= '1';
+       A3 <= '0';
+       A4 <= '1';
+       A5 <= '0';
+       
+--      30 - 111100 
+       wait for 29 ns;
+       A0 <= '1';
+       A1 <= '1';
+       A2 <= '1';
+       A3 <= '1';
+       A4 <= '0';
+       A5 <= '0';
+       
+--      31 - 111110
+       wait for 29 ns;
+       A0 <= '1';
+       A1 <= '1';
+       A2 <= '1';
+       A3 <= '1';
+       A4 <= '1';
+       A5 <= '0';
+       
+--      32 - 000001  
+       wait for 29 ns;
+       A0 <= '0';
+       A1 <= '0';
+       A2 <= '0';
+       A3 <= '0';
+       A4 <= '0';
+       A5 <= '1';       
+       
+--       wait;
+   end process;
+
+END;

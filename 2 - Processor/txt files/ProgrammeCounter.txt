@@ -1,0 +1,51 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.numeric_std.all;
+
+entity ProgrammeCounter is
+    Port( PC_in : in STD_LOGIC_VECTOR(31 downto 0);
+          PC_load, PC_increment : in STD_LOGIC;
+          reset : in std_logic;
+          clock : in std_logic;
+          PC_out : out STD_LOGIC_VECTOR(31 downto 0)
+        );
+end ProgrammeCounter;
+
+architecture Behavioral of ProgrammeCounter is
+
+        component Ripple_Adder is
+            Port(
+                A, B : in STD_LOGIC_VECTOR(31 downto 0);
+                Cin : in STD_LOGIC;
+                Cout, V_out : out STD_LOGIC;
+                G_out : out STD_LOGIC_VECTOR(31 downto 0)
+            );
+        end component;
+
+        signal ripple_out, address : std_logic_vector(31 downto 0);
+        signal carryin: std_logic;
+        
+        begin
+
+       RippleAdder : Ripple_Adder PORT MAP (
+            A => address,
+            B => PC_in,
+            Cin => '0',
+            G_out => ripple_out
+       );
+
+    process(PC_load, PC_increment, reset, clock)
+    begin
+        if(rising_edge(clock)) then
+            if PC_load = '1' and PC_increment = '0' then
+                address <= ripple_out;
+            elsif PC_load = '0' and PC_increment = '1' then
+                address <= std_logic_vector(unsigned(address) + 1);
+            end if;
+        end if;
+        if reset ='1' then
+            address <= X"00000000" after 3ns; --address of first instruction
+        end if;
+    end process;
+    PC_out <= address;  
+    end Behavioral;

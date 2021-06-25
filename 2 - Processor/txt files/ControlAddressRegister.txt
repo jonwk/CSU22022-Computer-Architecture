@@ -1,0 +1,32 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.numeric_std.all;
+
+entity CAR is
+    Port( CAR_in : in STD_LOGIC_VECTOR(16 downto 0);
+        MUX_S, reset : in STD_LOGIC;
+        clk : in STD_LOGIC;
+        CAR_out : out STD_LOGIC_VECTOR(16 downto 0)
+        );
+end CAR;
+
+architecture Behavioral of CAR is
+    
+        signal out_signal : std_logic_vector(16 downto 0);
+begin
+
+    process(CLK, MUX_S, reset)
+    begin
+    if(rising_edge(CLK)) then
+        if MUX_S = '1' then
+            out_signal <= CAR_in;
+        elsif MUX_S = '0' and (not falling_edge(MUX_S)) then
+            out_signal <= std_logic_vector( unsigned(out_signal) + 1);
+        end if;
+    end if;
+    if reset ='1' then
+            out_signal <= "0"& x"00fe"; -- exit address
+    end if;
+    end process;
+    CAR_out <= out_signal;
+end Behavioral;

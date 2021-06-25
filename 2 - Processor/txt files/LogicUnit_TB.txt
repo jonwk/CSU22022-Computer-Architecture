@@ -1,0 +1,63 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity LogicUnit_TB is
+end LogicUnit_TB;
+
+architecture Behavioral of LogicUnit_TB is
+
+COMPONENT Logic_Unit
+    PORT(
+         A : IN  std_logic_vector(31 downto 0);
+         B : IN  std_logic_vector(31 downto 0);
+         S : IN  std_logic_vector(1 downto 0);
+         G : OUT  std_logic_vector(31 downto 0)
+        );
+    END COMPONENT;
+    
+
+   --Inputs
+   signal A : std_logic_vector(31 downto 0) := (others => '0');
+   signal B : std_logic_vector(31 downto 0) := (others => '0');
+   signal S : std_logic_vector(1 downto 0) := (others => '0');
+
+    --Outputs
+   signal G : std_logic_vector(31 downto 0);
+    
+BEGIN
+ 
+    -- Instantiate the Unit Under Test (UUT)
+   uut: Logic_Unit PORT MAP (
+          A => A,
+          B => B,
+          S => S,
+          G => G
+        );
+
+-- Stimulus process
+   stim_proc: process
+   begin        
+        A <= x"11111111";
+        B <= x"00000000";
+        
+        S(0) <= '0';
+        S(1) <= '0';
+        wait for 200ns;
+         
+        S(0) <= '0';
+        S(1) <= '1';
+        wait for 200ns;
+        
+        S(0) <= '1';
+        S(1) <= '0';
+        wait for 200ns;
+        
+        S(0) <= '1';
+        S(1) <= '1';
+        wait for 200ns;
+   end process;
+
+END;

@@ -1,0 +1,87 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+
+ENTITY Memory_TB IS
+END Memory_TB;
+
+ARCHITECTURE behavior OF Memory_TB IS
+
+    component memory is -- use unsigned for memory address
+    Port ( address : in unsigned(31 downto 0);
+            write_data : in std_logic_vector(31 downto 0);
+            MemWrite : in std_logic;
+            clk : in std_logic;
+            read_data : out std_logic_vector(31 downto 0)
+            );
+    end component;
+    
+    --Inputs
+    signal address :  std_logic_vector(31 downto 0) := (others => '0');
+    signal write_data :  std_logic_vector(31 downto 0) := (others => '0');
+    signal MemWrite:  std_logic := '0';
+    signal clk:  std_logic := '0';
+    
+    --Outputs
+    signal read_data :  std_logic_vector(31 downto 0);
+
+begin    
+    -- Instantiate the Unit Under Test (UUT)
+    uut: memory PORT MAP (
+            address => unsigned(address(31 downto 0)),
+            write_data => write_data,
+            MemWrite => MemWrite,
+            clk => clk,
+            read_data => read_data
+            );
+            
+    -- Stimulus process
+    clk <= not clk after 10ns;
+    stim_proc: process
+    begin
+    
+    wait for 50ns;
+    
+    address <= x"00000001";
+    wait for 50ns;
+    
+    address <= x"00000002";
+    wait for 50ns;
+    
+    address <= x"00000003";
+    wait for 50ns;
+    
+    address <= x"00000000";
+    write_data <= x"00000000";
+    MemWrite <= '1';
+    wait for 50ns;
+    
+    address <= x"00000001";
+    write_data <= x"00000001";
+    wait for 50ns;
+    
+    address <= x"00000002";
+    write_data <= x"00000002";
+    wait for 50ns;
+    
+    address <= x"00000003";
+    write_data <= x"00000003";
+    wait for 50ns;
+    
+    address <= x"00000000";
+    MemWrite <= '0';
+    wait for 50ns;
+    
+    address <= x"00000001";
+    wait for 50ns;
+    
+    address <= x"00000002";
+    wait for 50ns;
+    
+    address <= x"00000003";
+    wait for 50ns;
+
+    wait;
+  end process;
+  
+  END;

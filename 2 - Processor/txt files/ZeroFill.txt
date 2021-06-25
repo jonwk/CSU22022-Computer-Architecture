@@ -1,0 +1,15 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity ZeroFill is
+    Port( SB_in : in STD_LOGIC_VECTOR(4 downto 0);
+        ZeroFill_out : out STD_LOGIC_VECTOR(31 downto 0)
+        );
+end ZeroFill;
+
+architecture Behavioral of ZeroFill is
+--    signal ZeroFill : STD_LOGIC_VECTOR(31 downto 0);
+begin
+    ZeroFill_out(4 downto 0) <= SB_in;
+    ZeroFill_out(31 downto 5) <= x"000000" & "000";;
+end Behavioral;

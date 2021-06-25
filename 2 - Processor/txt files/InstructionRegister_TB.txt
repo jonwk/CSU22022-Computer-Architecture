@@ -1,0 +1,67 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+ENTITY InstructionRegister_TB IS
+END InstructionRegister_TB;
+ 
+ARCHITECTURE behavior OF InstructionRegister_TB IS 
+ 
+    -- Component Declaration for the Unit Under Test (UUT)
+ 
+    COMPONENT InstructionRegister
+    PORT(
+         INSTR : IN  std_logic_vector(31 downto 0);
+         IL : IN  std_logic;
+         OPCODE : OUT  std_logic_vector(16 downto 0);
+         DR : OUT  std_logic_vector(4 downto 0);
+         SA : OUT  std_logic_vector(4 downto 0);
+         SB : OUT  std_logic_vector(4 downto 0)
+        );
+    END COMPONENT;
+    
+
+   --Inputs
+   signal INSTR : std_logic_vector(31 downto 0) := (others => '0');
+   signal IL : std_logic := '0';
+
+    --Outputs
+   signal OPCODE : std_logic_vector(16 downto 0);
+   signal DR : std_logic_vector(4 downto 0);
+   signal SA : std_logic_vector(4 downto 0);
+   signal SB : std_logic_vector(4 downto 0);
+
+
+BEGIN
+ 
+    -- Instantiate the Unit Under Test (UUT)
+   uut: InstructionRegister PORT MAP (
+          INSTR => INSTR,
+          IL => IL,
+          OPCODE => OPCODE,
+          DR => DR,
+          SA => SA,
+          SB => SB
+        );
+
+
+   -- Stimulus process
+   stim_proc: process
+   begin        
+        INSTR <= b"0_0000_0000_0000_0000" & b"00000_00000_00000";
+        IL <= '0';
+        wait for 200ns; -- Output should remain all 0's as IL = 0 
+        
+        INSTR <= b"0_1111_0000_1111_0000" & b"10000_00100_00001";
+        IL <= '1';
+        wait for 200ns; -- Output will be 01111000011110000_10000_00100_00001
+        
+        INSTR <= b"0_1111_1111_1111_0000" & b"10001_10100_00011";
+        IL <= '0';
+        wait for 200ns; -- Output should remain the same as previous as IL = 0
+        
+        INSTR <= b"1_1111_1111_1111_1111" & b"11111_11111_11111";
+        IL <= '1';
+        wait for 200ns; -- Output should be 11111111111111111_11111_11111_11111
+   end process;
+
+END;

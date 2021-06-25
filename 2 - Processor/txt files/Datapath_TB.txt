@@ -1,0 +1,466 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+
+entity Datapath_32B_TB is
+end Datapath_32B_TB;
+
+architecture Behavioral of Datapath_32B_TB is
+
+COMPONENT Datapath_32Bit
+   Port ( 
+           CONTROL_WORD : in  STD_LOGIC_VECTOR(23 downto 0);
+           CONST_IN : in  STD_LOGIC_VECTOR(31 downto 0);
+           DATA_IN : in  STD_LOGIC_VECTOR(31 downto 0);
+           CLK : in  STD_LOGIC;
+           TD, TA, TB : in STD_LOGIC;
+           ADDR_OUT : out  STD_LOGIC_VECTOR(31 downto 0);
+           DATA_OUT : out  STD_LOGIC_VECTOR(31 downto 0);
+           status_out : out STD_LOGIC_VECTOR(3 downto 0)
+           );
+    END COMPONENT;
+    
+
+   --Inputs
+   signal CONST_IN : std_logic_vector(31 downto 0) := (others => '0');
+   signal DATA_IN : std_logic_vector(31 downto 0) := (others => '0');
+   signal CLK : std_logic := '0';
+   signal CONTROL_WORD : STD_LOGIC_VECTOR(23 downto 0) := (others => '0');
+   -- |2   1|1   1|1   0|0|0|0|0|0|0|0|0|0|
+   -- |3   9|8   3|2   9|8|7       3|2|1|0|
+   -- |  D  |  A  |  B  |M|  F SEL  |M|L|M|
+   -- |DEST | ADD | ADD |B|  F SEL  |D|D|M|
+
+    --Outputs
+   signal ADDR_OUT : std_logic_vector(31 downto 0);
+   signal DATA_OUT : std_logic_vector(31 downto 0);
+   signal status_out : std_logic_vector(3 downto 0);
+   signal TD, TA, TB : std_logic := '0';
+   signal C, V, N, Z : std_logic;
+ 
+BEGIN
+ 
+    -- Instantiate the Unit Under Test (UUT)
+   uut: Datapath_32Bit PORT MAP (
+          CONTROL_WORD => CONTROL_WORD,
+          CONST_IN => CONST_IN,
+          DATA_IN => DATA_IN,
+          CLK => CLK,
+          TD => TD,
+          TA => TA,
+          TB => TB,
+          ADDR_OUT => ADDR_OUT,
+          DATA_OUT => DATA_OUT,
+          status_out => status_out
+        );
+
+
+ 
+CLK <= not CLK after 5ns; 
+   -- Stimulus process
+   stim_proc: process
+   begin
+
+     CONST_IN <= x"00000023";
+           
+--      A_add = 00000 , B_add = 00000 , D_add = 00000 MB_Sel =1, MD_sel =1, Load = 1 F_Sel = 00000
+--      R0 = DATA_IN
+      DATA_IN <= x"00000001";
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00000_00000_00000_1_00000_1_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);            
+      wait for 35ns; 
+      
+--      A_add = 00000 , B_add = 00000 , D_add = 00001 MB_Sel =1, MD_sel =1, Load = 1 F_Sel = 00001
+--      R1 = R0 + 1
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00001_00000_00000_1_00001_1_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+--      loading R1 to Data_out
+--      A_add = 00000 , B_add = 00001 , D_add = 00010 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 00010
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00010_00000_00001_0_00010_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+--      wait;
+ --      R1 = DATA_IN = 2          
+ --      A_add = 00000 , B_add = 00001 , D_add = 00001 MB_Sel =1, MD_sel =1, Load = 1 F_Sel = 00000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00001_00000_00001_1_00000_1_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      DATA_IN <= x"00000002";
+      wait for 35ns;
+      
+     ---- R2 = R0 + R1
+--      A_add = 00001 , B_add = 00000 , D_add = 00010 , MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 00010
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00010_00001_00000_0_00010_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+ -- loading R2 to  Data_Out
+      --      A_add = 00000 , B_add = 00010 , D_add = 00010 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00010_00000_00010_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      ---- R3 = R0 + R1 + 1
+--      A_add = 00000 , B_add = 00001 , D_add = 00011 , MB_Sel =1, MD_sel =1, Load = 1 F_Sel = 00011
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00011_00000_00001_1_00011_1_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+       -- loading R3 to  Data_Out
+      --      A_add = 00000 , B_add = 00011 , D_add = 00011 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00011_00000_00011_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- R4 = R1 + (R2 Bar)
+      --      A_add = 00001 , B_add = 00010 , D_add = 00100 MB_Sel =1, MD_sel =1, Load = 1 F_Sel = 00100
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00100_00001_00010_1_00100_1_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- loading R4 to  Data_Out
+      --      A_add = 00000 , B_add = 00100 , D_add = 00100 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00100_00000_00100_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- R5 = R1 + (R2 Bar) + 1
+      --      A_add = 00001 , B_add = 00010 , D_add = 00101 MB_Sel =1, MD_sel =1, Load = 1 F_Sel = 00101
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00101_00001_00010_1_00101_1_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- loading R5 to  Data_Out
+      --      A_add = 00000 , B_add = 00101 , D_add = 00101 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00101_00000_00101_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- R6 = R1 - 1
+      --      A_add = 00000 , B_add = 00001 , D_add = 00110 MB_Sel =1, MD_sel =1, Load = 1 F_Sel = 00110
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00110_00000_00001_1_00110_1_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- loading R6 to  Data_Out
+      --      A_add = 00000 , B_add = 00110 , D_add = 00101 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00101_00000_00110_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- R7 = R1
+      --      A_add = 00000 , B_add = 00001 , D_add = 00111 MB_Sel =1, MD_sel =1, Load = 1 F_Sel = 00111
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00111_00000_00001_1_00111_1_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- loading R7 to  Data_Out
+      --      A_add = 00000 , B_add = 00111 , D_add = 00111 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"00111_00000_00111_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+--      G = A  B F_Sel=01000 And
+    -- R8 = R1 ^ R2 
+      --      A_add = 00001 , B_add = 00010 , D_add = 01000 MB_Sel =1, MD_sel =1, Load = 1 F_Sel = 01000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"01101_00000_01101_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- loading R8 to  Data_Out
+      --      A_add = 00000 , B_add = 01000 , D_add = 01000 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"01000_00000_01000_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+--      G = A  B F_Sel = 01010 OR
+    -- R9 = R1 v R2 
+      --      A_add = 00001 , B_add = 00010 , D_add = 01001 MB_Sel =1, MD_sel =1, Load = 1 F_Sel = 01010
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"01001_00001_00010_1_01010_1_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- loading R9 to  Data_Out
+      --      A_add = 00000 , B_add = 01001 , D_add = 01001 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"01001_00000_01001_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+--      G = A xor B F_Sel = 01100 XOR
+    -- R10 = R1 xor R2 
+      --      A_add = 00001 , B_add = 00010 , D_add = 01010 MB_Sel =1, MD_sel =1, Load = 1 F_Sel = 01100
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"01010_00010_00010_1_01100_1_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- loading R10 to  Data_Out
+      --      A_add = 00000 , B_add = 01010 , D_add = 01010 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"01010_00000_01010_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+--      R11 =  - R0
+--      A_add = 00000 , B_add = 00001 , D_add = 01011 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000 
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"01011_00000_00001_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- loading R11 to  Data_Out
+      --      A_add = 00000 , B_add = 01011 , D_add = 01011 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"01011_00000_01011_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+--      R12 =  R1
+--      A_add = 00000 , B_add = 00001 , D_add = 01100 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000 
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"01100_00000_00001_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- loading R12 to  Data_Out
+      --      A_add = 00000 , B_add = 01100 , D_add = 01100 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"01100_00000_01100_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      --      R13 =  sr R1
+--      A_add = 00000 , B_add = 00001 , D_add = 01101 MB_Sel =1, MD_sel =1, Load = 1 F_Sel = 10100 
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"01101_00000_00001_1_10100_1_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- loading R13 to  Data_Out
+      --      A_add = 00000 , B_add = 01101 , D_add = 01101 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"01101_00000_01101_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3); 
+      wait for 35ns;
+      
+--      R14 =  sl R1
+--      A_add = 00000 , B_add = 00001 , D_add = 01110 MB_Sel =1, MD_sel =1, Load = 1 F_Sel = 11000 
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"01110_00000_00001_1_11000_1_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      
+      -- loading R14 to  Data_Out
+      --      A_add = 00000 , B_add = 01101 , D_add = 01101 MB_Sel =0, MD_sel =0, Load = 1 F_Sel = 10000
+                    -- |2   1|1   1|1   0|0|0   0|0|0|0|
+                    -- |3   9|8   4|3   9|8|7   3|2|1|0|
+                    -- |  D  |  A  |  B  |M|F SEL|M|L|M|
+                    -- |DEST | ADD | ADD |B|F SEL|D|D|M|
+      CONTROL_WORD <= b"01101_00000_01101_0_10000_0_1_0";
+      Z <= status_out(0);
+      N <= status_out(1);           
+      C <= status_out(2);
+      V <= status_out(3);
+      wait for 35ns;
+      wait;
+   end process;
+
+END;

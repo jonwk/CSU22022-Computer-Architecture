@@ -1,0 +1,85 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+--use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity Processor is
+    Port( Clk, reset: in STD_LOGIC
+);
+end Processor;
+
+architecture Behavioral of Processor is
+    
+    component Datapath_32Bit is
+    Port ( CONTROL_WORD : in  STD_LOGIC_VECTOR(23 downto 0);
+           CONST_IN : in  STD_LOGIC_VECTOR(31 downto 0);
+           DATA_IN : in  STD_LOGIC_VECTOR(31 downto 0);
+           CLK : in  STD_LOGIC;
+           TD, TA, TB : in STD_LOGIC;
+           ADDR_OUT : out  STD_LOGIC_VECTOR(31 downto 0);
+           DATA_OUT : out  STD_LOGIC_VECTOR(31 downto 0);
+           status_out : out STD_LOGIC_VECTOR(3 downto 0)
+           );
+    end component;
+    
+    component MicroprogrammeController is
+    Port(   IR : in STD_LOGIC_VECTOR(31 downto 0);
+            status_bits : in STD_LOGIC_VECTOR(3 downto 0);
+            reset_mpc : in STD_LOGIC;
+            clk_mpc : in STD_LOGIC;
+            control_word_mpc : out STD_LOGIC_VECTOR(23 downto 0);
+            PC_out : out STD_LOGIC_VECTOR(31 downto 0);
+            TD_mpc, TA_mpc, TB_mpc, MW_mpc : out STD_LOGIC
+        );
+    end component;
+    
+    
+    component memory is -- use unsigned for memory address
+    Port ( address : in unsigned(31 downto 0);
+            write_data : in std_logic_vector(31 downto 0);
+            MemWrite : in std_logic;
+            clk : in std_logic;
+            read_data : out std_logic_vector(31 downto 0)
+            );
+    end component;
+    
+    signal mm_read_data, mpc_pc_out, dp_data_out, dp_address_out : STD_LOGIC_VECTOR(31 downto 0):= (others => '0');
+    signal mpc_control_word : STD_LOGIC_VECTOR(23 downto 0):= (others => '0');
+    signal dp_status_out : STD_LOGIC_VECTOR(3 downto 0):= (others => '0');
+    signal mpc_TD, mpc_TA, mpc_TB, mpc_MW, mpc_MR : STD_LOGIC := '0';
+ 
+begin
+
+        mem_module : memory PORT MAP(
+        address => unsigned(dp_address_out(31 downto 0)),
+        write_data => dp_data_out,
+        MemWrite => mpc_MW,
+        clk => clk,
+        read_data => mm_read_data);
+            
+            
+        micro_pc : MicroprogrammeController PORT MAP(
+        IR => mm_read_data,
+        status_bits => dp_status_out,
+        reset_mpc => reset,
+        clk_mpc => clk,
+        control_word_mpc => mpc_control_word,
+        PC_out => mpc_pc_out,
+        TD_mpc => mpc_TD,
+        TA_mpc => mpc_TA,
+        TB_mpc => mpc_TB,
+        MW_mpc => mpc_MW);
+        
+        datapath : Datapath_32Bit PORT MAP(
+        DATA_IN => mm_read_data,
+        CONST_IN=> mpc_pc_out,
+        CONTROL_WORD =>  mpc_control_word,
+        CLK => Clk,
+        TD => mpc_TD,
+        TA => mpc_TA,
+        TB => mpc_TB,
+        DATA_OUT => dp_data_out,
+        ADDR_OUT => dp_address_out,
+        status_out => dp_status_out);
+        
+end Behavioral;

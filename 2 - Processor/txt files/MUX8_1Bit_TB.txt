@@ -1,0 +1,106 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity MUX8_1Bit_TB is
+end MUX8_1Bit_TB;
+
+architecture Behavioral of MUX8_1Bit_TB is
+
+COMPONENT MUX8_1Bit
+    Port (  In_zero, In_one, In_n, In_z, In_c, In_v, In_not_c, In_not_z : in STD_LOGIC;
+            S : in  STD_LOGIC_VECTOR(2 downto 0);
+            Z : out  STD_LOGIC);
+    END COMPONENT;
+    
+
+   --Inputs
+    signal In_zero : std_logic := '0';
+    signal In_one : std_logic := '0';
+    signal In_n : std_logic := '0';
+    signal In_z : std_logic := '0';
+    signal In_c : std_logic := '0';
+    signal In_v : std_logic := '0';
+    signal In_not_c : std_logic := '0';
+    signal In_not_z : std_logic := '0';
+    
+    signal S : STD_LOGIC_VECTOR(2 downto 0):= (others => '0');
+ 	
+ 	--Outputs
+   signal Z : std_logic;
+  
+BEGIN
+ 
+	-- Instantiate the Unit Under Test (UUT)
+   uut: MUX8_1Bit PORT MAP (
+            In_zero => In_zero,
+            In_one => In_one,
+            In_n => In_n,
+            In_z => In_z,
+            In_c => In_c,
+            In_v => In_v,
+            In_not_c => In_not_c,
+            In_not_z => In_not_z,
+            S => S,
+            Z => Z
+        );
+		  
+   -- Stimulus process
+   stim_proc: process
+   begin		
+--      wait for 10ns;
+		In_one <= '1';
+        In_c <= '1';
+        In_n <= '1';
+        In_v <= '1';
+        In_not_z <= '1';
+		
+		
+		S(0) <= '0';
+		S(1) <= '0';
+		S(2) <= '0';
+		
+		wait for 200ns;
+		
+		In_c <= '0';
+		In_z <= '1';
+        In_n <= '0';
+        In_v <= '0';
+        In_not_z <= '0';
+        In_not_c <= '1';
+        
+		S(0) <= '1';
+		S(1) <= '1';
+		S(2) <= '0';
+		
+		wait for 200ns;
+		
+		In_c <= '0';
+		In_z <= '1';
+        In_n <= '0';
+        In_v <= '0';
+        In_not_z <= '1';
+        In_not_c <= '0';
+        
+		S(0) <= '1';
+		S(1) <= '1';
+		S(2) <= '1';
+		
+		wait for 200ns;
+		
+		In_c <= '1';
+		In_z <= '0';
+        In_n <= '1';
+        In_v <= '1';
+        In_not_z <= '0';
+        In_not_c <= '1';
+        
+		S(0) <= '1';
+		S(1) <= '1';
+		S(2) <= '1';
+		
+		wait for 200ns;
+		
+		
+   end process;
+
+END;

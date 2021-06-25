@@ -1,0 +1,63 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+entity MicroProgrammeController_TB is
+end MicroProgrammeController_TB;
+
+architecture Behavioral of MicroProgrammeController_TB is
+
+component MicroprogrammeController is
+    Port(   IR : in STD_LOGIC_VECTOR(31 downto 0);
+            status_bits : in STD_LOGIC_VECTOR(3 downto 0);
+            reset_mpc : in STD_LOGIC;
+            clk_mpc : in STD_LOGIC;
+            control_word_mpc : out STD_LOGIC_VECTOR(23 downto 0);
+            PC_out : out STD_LOGIC_VECTOR(31 downto 0);
+            TD_mpc, TA_mpc, TB_mpc, MW_mpc : out STD_LOGIC
+        );
+end component;
+
+signal IR : STD_LOGIC_VECTOR(31 downto 0):= (others => '0');
+signal status_bits : STD_LOGIC_VECTOR(3 downto 0):=(others=>'0');
+signal reset_mpc : STD_LOGIC :='0';
+signal clk_mpc : STD_LOGIC :='0';
+
+signal control_word_mpc : STD_LOGIC_VECTOR(23 downto 0);
+signal PC_out : STD_LOGIC_VECTOR(31 downto 0);
+signal TD_mpc, TA_mpc, TB_mpc, MW_mpc : STD_LOGIC;
+
+
+begin
+   -- Instantiate the Unit Under Test (UUT)
+    uut: MicroprogrammeController PORT MAP (
+        IR => IR,
+        status_bits => status_bits,
+        reset_mpc => reset_mpc,
+        clk_mpc => clk_mpc,
+        control_word_mpc => control_word_mpc,
+        PC_out => PC_out,
+        TD_mpc => TD_mpc,
+        TA_mpc => TA_mpc,
+        TB_mpc => TB_mpc, 
+        MW_mpc => MW_mpc
+    );
+    
+
+    clk_mpc <= not clk_mpc after 25ns; 
+    -- Stimulus process
+    stim_proc: process
+    begin 
+        reset_mpc <= '1';
+        wait for 100ns;
+        
+        reset_mpc <= '0';
+        wait for 100ns;
+        
+        IR <= x"ffffffff";
+        status_bits <= x"f";
+
+--        wait;
+    end process;
+
+end Behavioral;
